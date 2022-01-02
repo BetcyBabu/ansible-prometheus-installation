@@ -1,0 +1,103 @@
+---
+- name: "Monitoring setup"
+  hosts: prometheus
+  become: true
+  tasks:
+    - include_tasks: prometheus_server.yml
+
+[root@ip-172-31-10-195 prometheus_server]# ll
+total 24
+-rw-r--r-- 1 root root  159 Jan  2 08:06 hosts
+-r-------- 1 root root 1676 Jan  2 04:54 key
+-rw-r--r-- 1 root root  125 Jan  2 08:45 main.yml
+-rw-r--r-- 1 root root 2171 Jan  2 08:04 prometheus_server.yml
+-rw-r--r-- 1 root root  433 Jan  2 07:03 prometheus.service
+-rw-r--r-- 1 root root  682 Jan  2 06:06 prometheus.yml
+[root@ip-172-31-10-195 prometheus_server]# cat prometheus_server.yml
+---
+- name: "Creating user prometheus"
+  user:
+    name: prometheus
+    create_home: no
+
+- name: "Creating /etc/prometheus folder"
+  file:
+    path: /etc/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+
+- name: "Creating /var/lib/prometheus folder"
+  file:
+    path: /var/lib/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+
+- name: "Downloading Prometheus"
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v2.32.1/prometheus-2.32.1.linux-amd64.tar.gz
+    dest: /home/
+
+- name: "Extracting prometheus-*.tar.gz"
+  unarchive:
+    remote_src: yes
+    src: /home/prometheus-2.32.1.linux-amd64.tar.gz
+    dest: /home/
+
+- name: "Moving extracted files to a folder prometheus-files"
+  copy:
+    remote_src: yes
+    src: /home/prometheus-2.32.1.linux-amd64/
+    dest: /home/prometheus-files/
+
+- name: "Copy prometheus folder from prometheus-files to /usr/local/bin/"
+  copy:
+    remote_src: yes
+    src: /home/prometheus-files/prometheus
+    dest: /usr/local/bin/
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+
+- name: "Copy promtool folder from prometheus-files to /usr/local/bin/"
+  copy:
+    remote_src: yes
+    src: /home/prometheus-files/promtool
+    dest: /usr/local/bin/
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+
+- name: "Move the consoles folder from prometheus-files to /etc/prometheus folder"
+  copy:
+    remote_src: yes
+    src: /home/prometheus-files/consoles
+    dest: /etc/prometheus
+    owner: prometheus
+    group: prometheus
+
+- name: "Move the console_libraries folder from prometheus-files to /etc/prometheus folder"
+  copy:
+    remote_src: yes
+    src: /home/prometheus-files/console_libraries
+    dest: /etc/prometheus
+    owner: prometheus
+    group: prometheus
+
+- name: "Configuring Prometheus to monitor itself"
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/
+    owner: prometheus
+    group: prometheus
+
+- name: "Creating Prometheus Service File"
+  copy:
+    src: prometheus.service
+    dest: /etc/systemd/system/
+- name: "Restarting/Enabling Prometheus"
+  service:
+    name: prometheus
+    state: restarted
+    enabled: true
