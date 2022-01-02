@@ -1,0 +1,6 @@
+---
+- name: "Monitoring setup"
+  hosts: prometheus
+  become: true
+  tasks:
+    - include_tasks: prometheus_server.yml
