@@ -1,20 +1,4 @@
 ---
-- name: "Monitoring setup"
-  hosts: prometheus
-  become: true
-  tasks:
-    - include_tasks: prometheus_server.yml
-
-[root@ip-172-31-10-195 prometheus_server]# ll
-total 24
--rw-r--r-- 1 root root  159 Jan  2 08:06 hosts
--r-------- 1 root root 1676 Jan  2 04:54 key
--rw-r--r-- 1 root root  125 Jan  2 08:45 main.yml
--rw-r--r-- 1 root root 2171 Jan  2 08:04 prometheus_server.yml
--rw-r--r-- 1 root root  433 Jan  2 07:03 prometheus.service
--rw-r--r-- 1 root root  682 Jan  2 06:06 prometheus.yml
-[root@ip-172-31-10-195 prometheus_server]# cat prometheus_server.yml
----
 - name: "Creating user prometheus"
   user:
     name: prometheus
