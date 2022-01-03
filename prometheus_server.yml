@@ -4,20 +4,6 @@
     name: prometheus
     create_home: no
 
-- name: "Creating /etc/prometheus folder"
-  file:
-    path: /etc/prometheus
-    state: directory
-    owner: prometheus
-    group: prometheus
-
-- name: "Creating /var/lib/prometheus folder"
-  file:
-    path: /var/lib/prometheus
-    state: directory
-    owner: prometheus
-    group: prometheus
-
 - name: "Downloading Prometheus"
   get_url:
     url: https://github.com/prometheus/prometheus/releases/download/v2.32.1/prometheus-2.32.1.linux-amd64.tar.gz
@@ -34,6 +20,8 @@
     remote_src: yes
     src: /home/prometheus-2.32.1.linux-amd64/
     dest: /home/prometheus-files/
+    owner: prometheus
+    group: prometheus
 
 - name: "Copy prometheus folder from prometheus-files to /usr/local/bin/"
   copy:
@@ -53,26 +41,10 @@
     group: prometheus
     mode: 0755
 
-- name: "Move the consoles folder from prometheus-files to /etc/prometheus folder"
-  copy:
-    remote_src: yes
-    src: /home/prometheus-files/consoles
-    dest: /etc/prometheus
-    owner: prometheus
-    group: prometheus
-
-- name: "Move the console_libraries folder from prometheus-files to /etc/prometheus folder"
-  copy:
-    remote_src: yes
-    src: /home/prometheus-files/console_libraries
-    dest: /etc/prometheus
-    owner: prometheus
-    group: prometheus
-
 - name: "Configuring Prometheus to monitor itself"
   copy:
     src: prometheus.yml
-    dest: /etc/prometheus/
+    dest: /home/prometheus-files/
     owner: prometheus
     group: prometheus
 
@@ -80,6 +52,7 @@
   copy:
     src: prometheus.service
     dest: /etc/systemd/system/
+
 - name: "Restarting/Enabling Prometheus"
   service:
     name: prometheus
