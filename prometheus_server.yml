@@ -8,14 +8,18 @@
   get_url:
     url: https://github.com/prometheus/prometheus/releases/download/v2.32.1/prometheus-2.32.1.linux-amd64.tar.gz
     dest: /home/
+  register: download_status
 
 - name: "Extracting prometheus-*.tar.gz"
+  when: download_status == true
   unarchive:
     remote_src: yes
     src: /home/prometheus-2.32.1.linux-amd64.tar.gz
     dest: /home/
 
+
 - name: "Moving extracted files to a folder prometheus-files"
+  when: download_status == true
   copy:
     remote_src: yes
     src: /home/prometheus-2.32.1.linux-amd64/
@@ -24,6 +28,7 @@
     group: prometheus
 
 - name: "Copy prometheus folder from prometheus-files to /usr/local/bin/"
+  when: download_status == true
   copy:
     remote_src: yes
     src: /home/prometheus-files/prometheus
@@ -33,6 +38,7 @@
     mode: 0755
 
 - name: "Copy promtool folder from prometheus-files to /usr/local/bin/"
+  when: download_status == true
   copy:
     remote_src: yes
     src: /home/prometheus-files/promtool
@@ -52,8 +58,10 @@
   copy:
     src: prometheus.service
     dest: /etc/systemd/system/
+  register: prometheus_status
 
 - name: "Restarting/Enabling Prometheus"
+  when: prometheus_status == true
   service:
     name: prometheus
     state: restarted
