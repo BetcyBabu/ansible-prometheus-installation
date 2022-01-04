@@ -1,6 +1,11 @@
 ---
 - name: "Monitoring setup"
-  hosts: prometheus
+  hosts: server
   become: true
+  vars:
+    URL: https://github.com/prometheus/prometheus/releases/download/v2.32.1/prometheus-2.32.1.linux-amd64.tar.gz
+    pro_version: 2.32.1
+    arch: amd64
+
   tasks:
     - include_tasks: prometheus_server.yml
