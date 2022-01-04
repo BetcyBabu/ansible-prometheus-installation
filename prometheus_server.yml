@@ -1,28 +1,4 @@
 ---
-- name : "Installing Node Exporter"
-  hosts: targets
-  become: true
-  vars:
-    URL: https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
-    ex_version: 1.3.1
-    arch: amd64
-  tasks:
-    - include_tasks: node_exporter.yml
-[root@ip-172-31-42-108 nodeexporter]# cd ..
-[root@ip-172-31-42-108 prometheus]# cd server/
-[root@ip-172-31-42-108 server]# l
--bash: l: command not found
-[root@ip-172-31-42-108 server]# ll
-total 28
--rw-r--r-- 1 root root  236 Jan  4 18:18 hosts
--r-------- 1 root root 1676 Jan  4 18:19 key.pem
--rw-r--r-- 1 root root  281 Jan  4 18:16 main.yml
--rw-r--r-- 1 root root 1460 Jan  4 18:16 prometheus_server.yml
--rw-r--r-- 1 root root  457 Jan  4 18:00 prometheus.service
--rw-r--r-- 1 root root  682 Jan  4 18:00 prometheus.yml
--rw-r--r-- 1 root root   33 Jan  4 18:00 README.md
-[root@ip-172-31-42-108 server]# cat prometheus_server.yml
----
 - name: "Creating user prometheus"
   user:
     name: prometheus
